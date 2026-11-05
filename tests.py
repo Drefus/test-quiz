@@ -2,6 +2,15 @@ import pytest
 from model import Question
 
 
+@pytest.fixture
+def question_with_choices():
+    question = Question(title='q1', max_selections=2)
+    question.add_choice('a', True)
+    question.add_choice('b')
+    question.add_choice('c', True)
+    return question
+
+
 def test_create_question():
     question = Question(title='q1')
     assert question.id != None
@@ -107,3 +116,14 @@ def test_correct_selected_choices():
     )
 
     assert selected_correct_choices == [correct_choice.id]
+
+
+def test_fixture_creates_question_with_multiple_choices(question_with_choices):
+    assert question_with_choices.title == 'q1'
+    assert [choice.text for choice in question_with_choices.choices] == ['a', 'b', 'c']
+
+
+def test_fixture_identifies_selected_correct_choices(question_with_choices):
+    selected_correct_choices = question_with_choices.correct_selected_choices([1, 2])
+
+    assert selected_correct_choices == [1]
